@@ -8,14 +8,17 @@
 TMP_DIR=`mktemp -d /tmp/distcc_make.XXXXXXX`
 mkdir -p $TMP_DIR
 
-#ARGS_WITHOUT_J="`echo "$@" | sed 's/-j[0-9]+//'`"
+ARGS_WITHOUT_J="`echo "$@" | sed 's/-j[0-9]\+//'`"
 ARG_J="`echo $@ | awk '{match($0, /-j([0-9]+)/, a); print a[1];}'`"
 
+echo "ARGS_WITHOUT_J:$ARGS_WITHOUT_J"
+
+echo "make --just-print"
 time (
-make --just-print $@ > "$TMP_DIR/commands.list"
+make --just-print $ARGS_WITHOUT_J > "$TMP_DIR/commands.list"
 )
-JOBS_COUNT=`cat "$TMP_DIR/commands.list" | grep '^distcc' | wc -l`
-CORES_COUNT=`nproc`
+JOBS_COUNT="`cat "$TMP_DIR/commands.list" | grep '^distcc' | wc -l`"
+CORES_COUNT="`nproc`"
 
 echo "CORES_COUNT:$CORES_COUNT JOBS_COUNT:$JOBS_COUNT"
 
@@ -28,9 +31,10 @@ if [ "$CORES_COUNT" -gt "$JOBS_COUNT" ]; then
 	fi
 else
 	echo "Submit jobs over network"
-	if [ -z "$ARG_J" ]; then
+	#if [ -z "$ARG_J" ]; then
 		ARG_J="`distcc -j`"
-	fi
+	#fi
+	echo "Settings parallel jobs count to $ARG_J"
 fi
 
 echo "DISTCC_HOSTS:$DISTCC_HOSTS"
@@ -39,7 +43,8 @@ echo "DISTCC_HOSTS:$DISTCC_HOSTS"
 #if ! type "parallel" > /dev/null; then
 if [ 1 ]; then
 	# If GNU Parallel is not installed, use make instead. This is a bit slower, because make was already executed above and is going to be executed again here
-	make $ARGS_WITHOUT_J -j$ARG_J
+	echo make -j$ARG_J $ARGS_WITHOUT_J
+	make -j$ARG_J $ARGS_WITHOUT_J
 else
 	# echo 'will cite' | parallel --citation
 
