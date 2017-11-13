@@ -27,6 +27,7 @@ if [ "$1" == "--install-service" ]; then
 fi
 
 TMP_DIR=`mktemp -d /tmp/distcc_test.XXXXXXX`
+echo "TMP_DIR:$TMP_DIR"
 mkdir -p $TMP_DIR
 
 cd $TMP_DIR
@@ -91,15 +92,25 @@ while [ 1 ]; do
 	> hosts.tmp
 
 	(
-		local_only=1
 		for local_hostname in "`hostname`" "localhost" "127.0.0.1"; do
 			echo '^'"$local_hostname"'\(/.*\)\?' >> "local_hostnames"
 		done
 
-		if [ ! -z "`cat hosts.tmp | grep -i -v -f local_hostnames`" ]; then
-			# Hosts file should be filled only when there are some non-local hostnames in the list
+		# filter-out local hostname
+		cat hosts.tmp \
+		| grep -i -v -f local_hostnames \
+		> hosts_nolocal.tmp
+
+		# Hosts file should be filled only when there are some non-local hostnames in the list
+		if [ ! -z "`cat hosts_nolocal.tmp`" ]; then
 			echo "--randomize"
-			cat hosts.tmp
+			cat hosts_nolocal.tmp
+		fi
+
+		# Localhost
+		local_threads_count="`nproc`"
+		if [ "$local_threads_count" -ge 3 ]; then
+			echo "localhost/`echo $local_threads_count / 2 | bc`"
 		fi
 	) > ~/.distcc/hosts
 
@@ -109,6 +120,5 @@ while [ 1 ]; do
 done
 ) 2>&1 | tee /var/log/distcc_test.log
 
-#echo "TMP_DIR:$TMP_DIR"
 rm -r $TMP_DIR
 
