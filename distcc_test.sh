@@ -11,7 +11,19 @@ MODE="PING" # PING | DISTCC
 if [ "$1" == "--install-service" ]; then
 	cp "$0" "/usr/bin/"
 
-	cygrunsrv.exe -I distccd_test -p /usr/bin/bash.exe -a "`basename $0`" -e PATH=$PATH -e HOME=$HOME
+	tmp="`cygrunsrv.exe --query distcc_test`"
+	not_installed=$?
+	if [ $not_installed == 0 ]; then
+		cygrunsrv.exe --remove distcc_test
+		if [ $? == 0 ]; then
+			echo "Successfully removed"
+		else
+			echo "Remove failed" >&2
+			exit 1
+		fi
+	fi
+
+	cygrunsrv.exe --install distcc_test -p /usr/bin/bash.exe -a "`basename $0`" -e PATH=$PATH -e HOME=$HOME
 	if [ $? == 0 ]; then
 		echo "Successfully installed"
 	else
