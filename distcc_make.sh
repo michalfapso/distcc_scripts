@@ -45,6 +45,11 @@ if [ 1 ]; then
 	# If GNU Parallel is not installed, use make instead. This is a bit slower, because make was already executed above and is going to be executed again here
 	echo make -j$ARG_J $ARGS_WITHOUT_J
 	make -j$ARG_J $ARGS_WITHOUT_J
+	ok="$?"
+	if [ "$ok" -ne 0 ]; then
+		echo "make failed. exiting"
+		exit $ok
+	fi
 else
 	# echo 'will cite' | parallel --citation
 
@@ -83,10 +88,11 @@ else
 
 	# Process parallel commands
 	cat $TMP_DIR/commands.list.distcc | parallel --max-procs "$ARG_J" --halt now,fail=1 --verbose
-	if [ $? -ne 0 ]; then
-		echo "exit code:$?"
+	ok="$?"
+	if [ "$ok" -ne 0 ]; then
+		echo "exit code:$ok"
 		echo "exiting make"
-		exit $?
+		exit $ok
 	fi
 	echo "running parallel jobs...done"
 
