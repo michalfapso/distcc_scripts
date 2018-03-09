@@ -5,16 +5,20 @@
 # Compile locally when all compile jobs can run simultaneously
 # on the local machine, otherwise submit jobs over the network
 
+# echo "args: $@"
+# echo "pwd: $PWD"
+
 TMP_DIR=`mktemp -d /tmp/distcc_make.XXXXXXX`
 mkdir -p $TMP_DIR
 
 ARGS_WITHOUT_J="`echo "$@" | sed 's/-j[0-9]\+//'`"
 ARG_J="`echo $@ | awk '{match($0, /-j([0-9]+)/, a); print a[1];}'`"
 
-echo "ARGS_WITHOUT_J:$ARGS_WITHOUT_J"
+# echo "ARGS_WITHOUT_J:$ARGS_WITHOUT_J"
 
-echo "make --just-print"
-time (
+# echo "make --just-print"
+# time \
+(
 make --just-print $ARGS_WITHOUT_J > "$TMP_DIR/commands.list"
 )
 JOBS_COUNT="`cat "$TMP_DIR/commands.list" | grep '^distcc' | wc -l`"
@@ -37,7 +41,7 @@ else
 	echo "Settings parallel jobs count to $ARG_J"
 fi
 
-echo "DISTCC_HOSTS:$DISTCC_HOSTS"
+# echo "DISTCC_HOSTS:$DISTCC_HOSTS"
 
 
 #if ! type "parallel" > /dev/null; then
@@ -105,6 +109,5 @@ else
 		fi
 	done
 fi
-
 
 rm -r $TMP_DIR
