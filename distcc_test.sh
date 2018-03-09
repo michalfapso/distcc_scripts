@@ -11,9 +11,24 @@ MODE="PING" # PING | DISTCC
 if [ "$1" == "--install-service" ]; then
 	cp "$0" "/usr/bin/"
 
-	tmp="`cygrunsrv.exe --query distcc_test`"
+	tmp="`cygrunsrv.exe --version`"
 	not_installed=$?
-	if [ $not_installed == 0 ]; then
+	echo "not_installed:$not_installed"
+	if [ "$not_installed" -ne 0 ]; then
+		echo "cygrunsrv is not installed -> installing now..." >&2
+		pacman -S cygrunsrv
+		
+		tmp="`cygrunsrv.exe --version`"
+		not_installed=$?
+		echo "not_installed:$not_installed"
+		if [ "$not_installed" -ne 0 ]; then
+			echo "ERROR: Unable to install cygrunsrv ...exit" >&2
+			exit 1
+		fi
+	fi
+	
+	cygrunsrv.exe --query distcc_test
+	if [ $? == 0 ]; then
 		cygrunsrv.exe --remove distcc_test
 		if [ $? == 0 ]; then
 			echo "Successfully removed"
@@ -22,7 +37,7 @@ if [ "$1" == "--install-service" ]; then
 			exit 1
 		fi
 	fi
-
+	
 	cygrunsrv.exe --install distcc_test -p /usr/bin/bash.exe -a "`basename $0`" -e PATH=$PATH -e HOME=$HOME
 	if [ $? == 0 ]; then
 		echo "Successfully installed"
@@ -31,7 +46,7 @@ if [ "$1" == "--install-service" ]; then
 		exit 1
 	fi
 
-	net start distccd_test
+	net start distcc_test
 	if [ $? == 0 ]; then
 		echo "Successfully executed"
 	else
@@ -143,4 +158,4 @@ done
 ) 2>&1 | tee /var/log/distcc_test.log
 
 rm -r $TMP_DIR
-
+ 
