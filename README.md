@@ -20,5 +20,8 @@ lubo-pc/8,lzo
 
 `make -j8` becomes `distcc_make.sh -j8`, compiling up to 8 files locally, but in case of more files, they are distributed using distcc to remote hosts.
 
+## Usage in Qt Creator
+Open Build Settings (Ctrl+5) -> Build Steps -> Make: (expand Details) -> Override ...: path_to_distcc_make.bat (e.g. D:\SourceCode\distcc_scripts\distcc_make.bat)
+
 # Checking availability of hosts
 `distcc_test.sh` runs in background as a service, periodically checks availability of hosts in `~/.distcc/hosts.all` and puts the available ones to `~/.distcc/hosts`
