@@ -11,6 +11,17 @@ MODE="PING" # PING | DISTCC
 if [ "$1" == "--install-service" ]; then
 	cp "$0" "/usr/bin/"
 
+	tmp="`bc --version`"
+	if [ $? -ne 0 ]; then
+		echo "missing bc package -> installing now..." >&2
+		pacman -S bc
+		tmp="`bc --version`"
+		if [ $? -ne 0 ]; then
+			echo "ERROR: Unable to install bc ...exit" >&2
+			exit 1
+		fi
+	fi
+
 	tmp="`cygrunsrv.exe --version`"
 	not_installed=$?
 	echo "not_installed:$not_installed"
