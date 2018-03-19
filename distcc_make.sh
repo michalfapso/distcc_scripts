@@ -26,10 +26,6 @@ CORES_COUNT="`nproc`"
 
 echo "CORES_COUNT:$CORES_COUNT JOBS_COUNT:$JOBS_COUNT"
 
-if [ $JOBS_COUNT -eq 0 ]; then
-	exit 0
-fi
-
 # Determine whether to distribute jobs or run locally
 if [ "$CORES_COUNT" -gt "$JOBS_COUNT" ]; then
 	echo "Run locally"
