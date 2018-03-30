@@ -22,21 +22,22 @@ ARG_J="`echo $@ | awk '{match($0, /-j([0-9]+)/, a); print a[1];}'`"
 make --just-print $ARGS_WITHOUT_J > "$TMP_DIR/commands.list"
 )
 JOBS_COUNT="`cat "$TMP_DIR/commands.list" | grep '^distcc' | wc -l`"
-CORES_COUNT="`nproc`"
+CORES_COUNT_LOCAL="`nproc`"
+CORES_COUNT_REMOTE="`distcc -j`"
 
-echo "CORES_COUNT:$CORES_COUNT JOBS_COUNT:$JOBS_COUNT"
+echo "CORES_COUNT_LOCAL:$CORES_COUNT_LOCAL CORES_COUNT_REMOTE:$CORES_COUNT_REMOTE JOBS_COUNT:$JOBS_COUNT"
 
 # Determine whether to distribute jobs or run locally
-if [ "$CORES_COUNT" -gt "$JOBS_COUNT" ]; then
+if [[ ("$CORES_COUNT_LOCAL" -gt "$JOBS_COUNT") || ("$CORES_COUNT_LOCAL" -gt "$CORES_COUNT_REMOTE") ]]; then
 	echo "Run locally"
 	export DISTCC_HOSTS='localhost'
 	if [ -z "$ARG_J" ]; then
-		ARG_J="$CORES_COUNT"
+		ARG_J="$CORES_COUNT_LOCAL"
 	fi
 else
 	echo "Submit jobs over network"
 	#if [ -z "$ARG_J" ]; then
-		ARG_J="`distcc -j`"
+		ARG_J="$CORES_COUNT_REMOTE"
 	#fi
 	echo "Settings parallel jobs count to $ARG_J"
 fi
