@@ -28,7 +28,7 @@ CORES_COUNT_REMOTE="`distcc -j`"
 echo "CORES_COUNT_LOCAL:$CORES_COUNT_LOCAL CORES_COUNT_REMOTE:$CORES_COUNT_REMOTE JOBS_COUNT:$JOBS_COUNT"
 
 # Determine whether to distribute jobs or run locally
-if [[ ("$CORES_COUNT_LOCAL" -gt "$JOBS_COUNT") || ("$CORES_COUNT_LOCAL" -gt "$CORES_COUNT_REMOTE") ]]; then
+if [[ ("$CORES_COUNT_LOCAL" -ge "$JOBS_COUNT") || ("$CORES_COUNT_LOCAL" -ge "$CORES_COUNT_REMOTE") ]]; then
 	echo "Run locally"
 	export DISTCC_HOSTS='localhost'
 	if [ -z "$ARG_J" ]; then
