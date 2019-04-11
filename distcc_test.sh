@@ -141,6 +141,7 @@ while [ 1 ]; do
 	| awk '$2 == "OK" { print $1 }' \
 	> hosts.tmp
 
+	echo "generating hosts.tmp2..." >&2
 	(
 		for local_hostname in "`hostname`" "localhost" "127.0.0.1"; do
 			echo '^'"$local_hostname"'\(/.*\)\?' >> "local_hostnames"
@@ -162,7 +163,14 @@ while [ 1 ]; do
 		if [ "$local_threads_count" -ge 3 ]; then
 			echo "localhost/`echo $local_threads_count / 2 | bc`"
 		fi
-	) > ~/.distcc/hosts
+	) > hosts.tmp2
+	echo "generating hosts.tmp2...done" >&2
+	echo "hosts.tmp2 contents:" >&2
+	cat hosts.tmp2 >&2
+
+	echo "copying to ~/.distcc/hosts..." >&2
+	cp hosts.tmp2 ~/.distcc/hosts
+	echo "copying to ~/.distcc/hosts...done" >&2
 
 	echo "sleeping..."
 	sleep 5m
