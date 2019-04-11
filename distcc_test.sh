@@ -110,7 +110,9 @@ while [ 1 ]; do
 
 		if [ "$MODE" == "PING" ]; then
 			host_onlyname="`echo "$host" | sed 's/[\/,].*//'`"
-			status=`ping -n 1 $host_onlyname | awk '/Received =/ {if ($7=="1,") ok=1} END{if(ok) {print "OK"} else {print "BAD"}}'`
+			#echo ping -n 1 $host_onlyname
+			#ping -n 1 $host_onlyname
+			status=`ping -4 -n 1 $host_onlyname | awk '/Received =/ {if ($7=="1,") ok=1} END{if(ok) {print "OK"} else {print "BAD"}}'`
 			echo $host $status
 		else
 			make clean >/dev/null 2>&1
