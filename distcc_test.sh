@@ -161,7 +161,7 @@ while [ 1 ]; do
 		# Localhost
 		local_threads_count="`nproc`"
 		if [ "$local_threads_count" -ge 3 ]; then
-			echo "localhost/`echo $local_threads_count / 2 | bc`"
+			echo "localhost/`echo $local_threads_count - 2 | bc`"
 		fi
 	) > hosts.tmp2
 	echo "generating hosts.tmp2...done" >&2
