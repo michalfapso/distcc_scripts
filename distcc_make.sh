@@ -30,7 +30,7 @@ echo "CORES_COUNT_LOCAL:$CORES_COUNT_LOCAL CORES_COUNT_REMOTE:$CORES_COUNT_REMOT
 # Determine whether to distribute jobs or run locally
 if [[ ("$CORES_COUNT_LOCAL" -ge "$JOBS_COUNT") || ("$CORES_COUNT_LOCAL" -ge "$CORES_COUNT_REMOTE") ]]; then
 	echo "Run locally"
-	export DISTCC_HOSTS='localhost'
+	export DISTCC_HOSTS="localhost/$CORES_COUNT_LOCAL"
 	if [ -z "$ARG_J" ]; then
 		ARG_J="$CORES_COUNT_LOCAL"
 	fi
